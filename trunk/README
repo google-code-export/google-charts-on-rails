@@ -1,0 +1,21 @@
+GoogleChartsOnRails
+===================
+
+This plugin is meant to abstract the Google Charts API
+
+
+Example
+=======
+
+GoogleChart.pie([10,20,40,30])
+
+With size:
+
+GoogleChart.pie_100x200([10,20,40,30])
+
+With labels:
+
+GoogleChart.pie_100x200(['1997',10],['1998',20],['1999',40],['2000',30])
+
+
+Copyright (c) 2007 blj, released under the MIT license
