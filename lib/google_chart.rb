@@ -1,4 +1,5 @@
 class GoogleChart
+  include ActionView::Helpers
   SERVER = 'http://chart.apis.google.com/chart?'.freeze
   TYPE_VAR = 'cht'.freeze
   SIZE_VAR = 'chs'.freeze
@@ -18,24 +19,26 @@ class GoogleChart
     :venn => 'v',
     :scatter_plot => 's',
   }.freeze
-  TYPE_MATCHING_REGEX = /#{TYPE_VAR_VALUES.keys.collect{|key|key.to_s} * '|'}/
-  SIZE_MATCHING_REGEX = /([0-9]+)x([0-9]+)/
+  #have to collect key and sort to reverse becuase of the greedy regex
+  TYPE_MATCHING_REGEX = /#{TYPE_VAR_VALUES.keys.collect{|t|t.to_s}.sort.reverse * '|'}/i.freeze
+  
+  SIZE_MATCHING_REGEX = /([0-9]+)x([0-9]+)/i.freeze
   DEFAULT_HEIGHT = 200
   DEFAULT_WIDTH = 200
   def self.method_missing(method, *args)
-    protect_from_deep_stack do
-      GoogleChart.new do |chart|
-        chart.identifier(method, args)
-      end
-    end
+    new.identifier(method, args)
+#    protect_from_deep_stack do
+#      
+#    end
   end
-  def identifier(method, *args)
+  def identifier(method, args)
     method_to_match = method.to_s
     identify_type(method_to_match)
     identify_size(method_to_match)
-    self.data = args
+    identify_things_from_args(args)
+    self
   end
-  def respond_to?(method)
+  def self.respond_to?(method)
     #TODO: have to check with identifiers before returning true
     true 
   end
@@ -72,17 +75,37 @@ class GoogleChart
     end
     "#{SERVER}#{(chart_params * '&amp;')}"
   end
-  def to_img(options={})
-    html_options = ''
-    unless options.blank?
-      options.each_pair{|key,value| html_options<<" #{key}='#{value}'"}
-    end
-    "<img src='#{to_url}'#{html_options}/>"
+  def to_s
+    to_url
   end
-
 protected
+  #identifiers starts here
   def identify_type(source)
     self.type= source.match(TYPE_MATCHING_REGEX)[0]
+  end
+
+  def identify_things_from_args(args)
+    #this identies the data and any labels that are attached
+    case args[0]
+      when Array
+        #check if array has arrays with in for lables and data
+        split_data_and_labels_from_array(args)
+      when Hash
+        self.data = args[0].values
+        self.labels = args[0].keys
+    else
+      self.data = args
+    end
+  end
+  def split_data_and_labels_from_array(passed_array)
+    data_array = []
+    label_array = []
+    passed_array.each do |piece|
+      label_array << piece[0]
+      data_array << piece[1]
+    end
+    self.data = data_array
+    self.labels = label_array
   end
   def identify_size(source)
     matched = source.match(SIZE_MATCHING_REGEX) 
@@ -91,18 +114,8 @@ protected
       self.width = matched[2].to_i 
     end
   end
-  def join(thingy)
-    case thingy
-      when String
-        thingy
-      when Array
-        thingy * ','
-    end
-  end
-
-  def join_labels
-    @labels.collect{|l|CGI.escape(l)}.join('|')    
-  end
+  #identifiers ends here
+  #encoding starts here
   def data_encoding_type
     #TODO: identify the data type automatically after the data array is set
     @data_encoding_type || :text
@@ -117,7 +130,6 @@ protected
         @encoded_data = extended_encode(@data)
     end
   end
-  #encoding starts here
   SIMPLE_ENCODING_SOURCE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.freeze
   def simple_encode(data_to_encode)
     simple_encoding_size_minus_one = SIMPLE_ENCODING_SOURCE.size - 1
@@ -155,5 +167,19 @@ protected
     @protection_from_deep_stack_is_set = false
     whatever
   end
+  
+  def join(thingy)
+    case thingy
+      when String
+        thingy
+      when Array
+        thingy * ','
+    end
+  end
+
+  def join_labels
+    @labels.collect{|l|CGI.escape(l.to_s)}.join('|')
+  end
+
   #utils end
 end
