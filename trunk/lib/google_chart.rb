@@ -26,10 +26,10 @@ class GoogleChart
   DEFAULT_HEIGHT = 200
   DEFAULT_WIDTH = 200
   def self.method_missing(method, *args)
-    new.identifier(method, args)
-#    protect_from_deep_stack do
-#      
-#    end
+    #TODO make it thread safe by creating a separate class, presently it could be bad
+    protect_from_deep_stack do
+      new.identifier(method, args)
+    end
   end
   def identifier(method, args)
     method_to_match = method.to_s
