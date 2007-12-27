@@ -131,14 +131,14 @@ protected
     end
   end
   SIMPLE_ENCODING_SOURCE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.freeze
+  SIMPLE_ENCODING_SIZE_MINUS_ONE = SIMPLE_ENCODING_SOURCE.size - 1
   def simple_encode(data_to_encode)
-    simple_encoding_size_minus_one = SIMPLE_ENCODING_SOURCE.size - 1
     max_value = data_to_encode.max
     encoded= 's:'
     data_to_encode.each do |current_value|
       #is there a better way of checking if an object is one of the numeric class
       if current_value.respond_to?(:integer?) && current_value >= 0
-        encoded<<simpleEncoding[simple_encoding_size_minus_one * currentValue / max_value]
+        encoded<<simpleEncoding[SIMPLE_ENCODING_SIZE_MINUS_ONE * currentValue / max_value]
       else
         encoded<<'_'
       end
