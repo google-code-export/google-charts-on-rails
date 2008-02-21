@@ -2,6 +2,7 @@ class GoogleChart
   include ActionView::Helpers
   SERVER = 'http://chart.apis.google.com/chart?'.freeze
   TYPE_VAR = 'cht'.freeze
+  TITLE_VAR = 'chtt'.freeze
   SIZE_VAR = 'chs'.freeze
   DATA_VAR = 'chd'.freeze
   LABELS_VAR = 'chl'.freeze
@@ -21,7 +22,6 @@ class GoogleChart
   }.freeze
   #have to collect key and sort to reverse becuase of the greedy regex
   TYPE_MATCHING_REGEX = /#{TYPE_VAR_VALUES.keys.collect{|t|t.to_s}.sort.reverse * '|'}/i.freeze
-  
   SIZE_MATCHING_REGEX = /([0-9]+)x([0-9]+)/i.freeze
   DEFAULT_HEIGHT = 200
   DEFAULT_WIDTH = 200
@@ -53,6 +53,7 @@ class GoogleChart
     @type = t.to_sym
   end
   attr_accessor :colors
+  attr_accessor :title
   attr_accessor :labels
   attr_accessor :data
   attr_accessor :height
@@ -61,10 +62,17 @@ class GoogleChart
   #TODO: add support for bar width and spacing chbh=<bar width in pixels>,<optional space between groups>
   attr_accessor :bar_width
   attr_accessor :bar_spacing
+  attr_writer :data_encoding_type
+  def data_encoding_type
+    #TODO: identify the data type automatically after the data array is set
+    @data_encoding_type || :text
+  end  
+
   def to_url
     params = {}
     params[TYPE_VAR] = TYPE_VAR_VALUES[@type]
-    params[SIZE_VAR] = "#{@height||DEFAULT_HEIGHT}x#{@width||DEFAULT_WIDTH}"
+    params[TITLE_VAR] = @title if @title
+    params[SIZE_VAR] = "#{@width||DEFAULT_WIDTH}x#{@height||DEFAULT_HEIGHT}"
     params[DATA_VAR] = encode_data
     params[LABELS_VAR] = join_labels if (@labels && @show_labels)
     params[COLORS_VAR] = join(@colors) if (@colors)
@@ -110,16 +118,12 @@ protected
   def identify_size(source)
     matched = source.match(SIZE_MATCHING_REGEX) 
     if matched
-      self.height = matched[1].to_i
-      self.width = matched[2].to_i 
+      self.width = matched[1].to_i 
+      self.height = matched[2].to_i
     end
   end
   #identifiers ends here
   #encoding starts here
-  def data_encoding_type
-    #TODO: identify the data type automatically after the data array is set
-    @data_encoding_type || :text
-  end
   def encode_data
     case data_encoding_type
       when :simple
@@ -131,14 +135,14 @@ protected
     end
   end
   SIMPLE_ENCODING_SOURCE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'.freeze
+  SIMPLE_ENCODING_SIZE_MINUS_ONE = SIMPLE_ENCODING_SOURCE.size - 1
   def simple_encode(data_to_encode)
-    simple_encoding_size_minus_one = SIMPLE_ENCODING_SOURCE.size - 1
-    max_value = data_to_encode.max
+    max_value = data_to_encode.compact.max
     encoded= 's:'
     data_to_encode.each do |current_value|
       #is there a better way of checking if an object is one of the numeric class
       if current_value.respond_to?(:integer?) && current_value >= 0
-        encoded<<simpleEncoding[simple_encoding_size_minus_one * currentValue / max_value]
+        encoded<<SIMPLE_ENCODING_SOURCE[SIMPLE_ENCODING_SIZE_MINUS_ONE * current_value / max_value]
       else
         encoded<<'_'
       end
