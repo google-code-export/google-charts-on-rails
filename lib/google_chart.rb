@@ -2,6 +2,7 @@ class GoogleChart
   include ActionView::Helpers
   SERVER = 'http://chart.apis.google.com/chart?'.freeze
   TYPE_VAR = 'cht'.freeze
+  TITLE_VAR = 'chtt'.freeze
   SIZE_VAR = 'chs'.freeze
   DATA_VAR = 'chd'.freeze
   LABELS_VAR = 'chl'.freeze
@@ -53,6 +54,7 @@ class GoogleChart
     @type = t.to_sym
   end
   attr_accessor :colors
+  attr_accessor :title
   attr_accessor :labels
   attr_accessor :data
   attr_accessor :height
@@ -64,6 +66,7 @@ class GoogleChart
   def to_url
     params = {}
     params[TYPE_VAR] = TYPE_VAR_VALUES[@type]
+    params[TITLE_VAR] = @title if @title
     params[SIZE_VAR] = "#{@width||DEFAULT_WIDTH}x#{@height||DEFAULT_HEIGHT}"
     params[DATA_VAR] = encode_data
     params[LABELS_VAR] = join_labels if (@labels && @show_labels)
