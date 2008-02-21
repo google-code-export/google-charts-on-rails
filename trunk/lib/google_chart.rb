@@ -64,7 +64,7 @@ class GoogleChart
   def to_url
     params = {}
     params[TYPE_VAR] = TYPE_VAR_VALUES[@type]
-    params[SIZE_VAR] = "#{@height||DEFAULT_HEIGHT}x#{@width||DEFAULT_WIDTH}"
+    params[SIZE_VAR] = "#{@width||DEFAULT_WIDTH}x#{@height||DEFAULT_HEIGHT}"
     params[DATA_VAR] = encode_data
     params[LABELS_VAR] = join_labels if (@labels && @show_labels)
     params[COLORS_VAR] = join(@colors) if (@colors)
@@ -110,8 +110,8 @@ protected
   def identify_size(source)
     matched = source.match(SIZE_MATCHING_REGEX) 
     if matched
-      self.height = matched[1].to_i
-      self.width = matched[2].to_i 
+      self.width = matched[1].to_i 
+      self.height = matched[2].to_i
     end
   end
   #identifiers ends here
