@@ -58,8 +58,9 @@ Lets do it the old fashioned way:
 
 	#reuse and change size, set labels for big chart
 	sales_chart.labels = ['year 1997','year 1998','year 1999','year 2000']
-	sales_chart.height = 600
-	sales_chart.width = 350
+	sales_chart.height = 350
+	sales_chart.width = 600
+	sales_chart.title = "Sales Chart"
 	big_sales_chart_url = sales_chart.to_url
 	
 Copyright (c) 2007 Balaji Raghavan, released under the MIT license
