@@ -29,7 +29,7 @@ Pretty much anything would work:
     GoogleChart.venn
     GoogleChart.scatter_plot
 
-which you can marry with the size
+which you can marry with the size as <width in pixels>x<height in pixels>
 
 	GoogleChart.pie_100x200(10,20,40,30).to_url
 	
@@ -47,8 +47,9 @@ Lets do it the old fashioned way:
 	sales_chart.type = :pie
 	sales_chart.data = [10, 20, 15, 55]
 
-	sales_chart.height = 200
 	sales_chart.width = 150
+	sales_chart.height = 200
+	
 	
 	#change the default colour with the hex code
 	sales_chart.colors = '346090'
