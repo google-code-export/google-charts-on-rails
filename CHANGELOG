@@ -1,0 +1,8 @@
+== Change Log
+
+=== 0.2.0 ReyaOptima (December 27,  2007)
+* Optimised few methods and constants
+* Protection from stack level too deep enabled
+
+=== 0.1.0 Reya (December 13, 2008)
+* First release.
