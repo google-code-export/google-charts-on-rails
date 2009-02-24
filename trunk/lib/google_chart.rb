@@ -20,6 +20,7 @@ class GoogleChart
     :pie_3d => 'p3',
     :venn => 'v',
     :scatter_plot => 's',
+    :meter => 'gom'
   }.freeze
   #have to collect key and sort to reverse becuase of the greedy regex
   TYPE_MATCHING_REGEX = /#{TYPE_VAR_VALUES.keys.collect{|t|t.to_s}.sort.reverse * '|'}/i.freeze
