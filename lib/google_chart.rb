@@ -10,6 +10,7 @@ class GoogleChart
   BAR_WIDTH_SPACING_VAR = 'chbh'.freeze
   TYPE_VAR_VALUES = {
     :line => 'lc',
+    :sparkline => 'ls',
     :line_xy => 'lxy',
     :bar_horizontal_stacked => 'bhs',
     :bar_vertical_stacked => 'bvs',
